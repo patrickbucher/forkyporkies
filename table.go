@@ -3,6 +3,7 @@ package forkyporkies
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 )
 
@@ -18,17 +19,13 @@ type Entry struct {
 
 func (t Table) Output() {
 	tw := new(tabwriter.Writer).Init(os.Stdout, 0, 8, 2, ' ', 0)
-	format := "%s"
-	for i := 0; i < len(t.Repos); i++ {
-		format += "\t%s"
-	}
-	format += "\n"
+	format := "%s" + strings.Repeat("\t%s", len(t.Repos)) + "\n"
 	th := make([]string, 1)
 	th[0] = "Author"
 	for _, r := range t.Repos {
 		th = append(th, r)
 	}
-	fmt.Fprintf(tw, format, th)
+	fmt.Fprintf(tw, format, toAny(th)...)
 	for _, e := range t.Forks {
 		commits := make([]uint, 0)
 		for _, r := range t.Repos {
@@ -43,7 +40,15 @@ func (t Table) Output() {
 		for _, c := range commits {
 			tr = append(tr, fmt.Sprintf("%d", c))
 		}
-		fmt.Fprintf(tw, format, tr)
+		fmt.Fprintf(tw, format, toAny(tr)...)
 	}
 	tw.Flush()
+}
+
+func toAny(xs []string) []any {
+	ys := make([]any, len(xs))
+	for i := 0; i < len(xs); i++ {
+		ys[i] = xs[i]
+	}
+	return ys
 }
