@@ -40,7 +40,7 @@ func (t Table) Output() {
 		for _, c := range commits {
 			tr = append(tr, fmt.Sprintf("%d", c))
 		}
-		format = "%s" + strings.Repeat("\t%d", len(t.Repos)) + "\n"
+		format = "%s" + strings.Repeat("\t%s", len(t.Repos)) + "\n"
 		fmt.Fprintf(tw, format, toAny(tr)...)
 	}
 	tw.Flush()
