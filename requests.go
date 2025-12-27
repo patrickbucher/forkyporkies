@@ -2,6 +2,7 @@ package forkyporkies
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -19,17 +20,38 @@ func (r Repo) String() string {
 	return fmt.Sprintf("%s/%s", r.Owner, r.Name)
 }
 
-type Fork struct{}
-type Commit struct{}
+func FromFork(f Fork) Repo {
+	return Repo{
+		Owner: f.Owner.Login,
+		Name:  f.Name,
+	}
+}
+
+type Fork struct {
+	Name     string `json:"name"`
+	FullName string `json:"full_name"`
+	Owner    struct {
+		Login string `json:"login"`
+	} `json:"owner"`
+}
+
+type Commit struct {
+	Author struct {
+		Login string `json:"login"`
+	} `json:"author"`
+}
 
 func (r *Repo) GetForks(token string) ([]Fork, error) {
 	body, err := get(fmt.Sprintf("repos/%s/%s/forks", r.Owner, r.Name), token)
 	if err != nil {
 		return nil, fmt.Errorf("get forks for %s/%s: %v", r.Owner, r.Name, err)
 	}
-	fmt.Println(body)
-	// FIXME: unmarshal JSON
-	return []Fork{}, nil
+	var forks []Fork
+	err = json.Unmarshal(body.Bytes(), &forks)
+	if err != nil {
+		return forks, fmt.Errorf("unmarshal forks: %v", err)
+	}
+	return forks, nil
 }
 
 func (r *Repo) GetCommits(token string) ([]Commit, error) {
@@ -37,9 +59,12 @@ func (r *Repo) GetCommits(token string) ([]Commit, error) {
 	if err != nil {
 		return nil, fmt.Errorf("get commits for %s/%s: %v", r.Owner, r.Name, err)
 	}
-	fmt.Println(body)
-	// FIXME: unmarshal JSON
-	return []Commit{}, nil
+	var commits []Commit
+	err = json.Unmarshal(body.Bytes(), &commits)
+	if err != nil {
+		return commits, fmt.Errorf("unmarshal commits: %v", err)
+	}
+	return commits, nil
 }
 
 func get(resource, token string) (*bytes.Buffer, error) {

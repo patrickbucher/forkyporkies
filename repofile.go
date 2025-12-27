@@ -16,7 +16,6 @@ func Parse(path string) ([]Repo, error) {
 	for l := range lines {
 		repo := strings.Split(strings.TrimSpace(l), "/")
 		if len(repo) != 2 {
-			fmt.Fprintf(os.Stderr, "invalid repo identifier '%s'", l)
 			continue
 		}
 		repos = append(repos, Repo{Owner: repo[0], Name: repo[1]})
