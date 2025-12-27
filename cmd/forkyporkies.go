@@ -23,7 +23,7 @@ func main() {
 		os.Exit(1)
 	}
 	t := fetchForkCommits(repos, token)
-	fmt.Println(t)
+	t.Output()
 }
 
 func fetchForkCommits(repos []fp.Repo, token string) fp.Table {
