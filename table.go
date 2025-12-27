@@ -23,7 +23,7 @@ func (t Table) Output() {
 	th := make([]string, 1)
 	th[0] = "Author"
 	for _, r := range t.Repos {
-		th = append(th, r)
+		th = append(th, strings.Split(r, "/")[1])
 	}
 	fmt.Fprintf(tw, format, toAny(th)...)
 	for _, e := range t.Forks {
@@ -40,6 +40,7 @@ func (t Table) Output() {
 		for _, c := range commits {
 			tr = append(tr, fmt.Sprintf("%d", c))
 		}
+		format = "%s" + strings.Repeat("\t%d", len(t.Repos)) + "\n"
 		fmt.Fprintf(tw, format, toAny(tr)...)
 	}
 	tw.Flush()
