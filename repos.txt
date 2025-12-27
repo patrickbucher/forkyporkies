@@ -2,4 +2,3 @@ patrickbucher/average-test-doubles
 patrickbucher/separation-of-concerns
 patrickbucher/connect-four-debugging
 patrickbucher/currency-converter
-patrickbucher/performance-tests
