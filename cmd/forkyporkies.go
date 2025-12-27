@@ -22,7 +22,17 @@ func main() {
 		fmt.Fprintf(os.Stderr, "parse repo file: %v\n", err)
 		os.Exit(1)
 	}
+	t := fetchForkCommits(repos, token)
+	fmt.Println(t)
+}
+
+func fetchForkCommits(repos []fp.Repo, token string) fp.Table {
+	t := fp.Table{
+		Repos: make([]string, 0),
+		Forks: make(map[string]fp.Entry, 0),
+	}
 	for _, r := range repos {
+		t.Repos = append(t.Repos, r.String())
 		forks, err := r.GetForks(token)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "get fork for %s: %v\n", r, err)
@@ -30,17 +40,26 @@ func main() {
 		}
 		for _, f := range forks {
 			fr := fp.FromFork(f)
-			fmt.Println(fr)
+			login := f.Owner.Login
 			commits, err := fr.GetCommits(token)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "get commits for %v: %v", fr, err)
 				continue
 			}
-			for _, c := range commits {
-				if c.Author.Login != r.Owner {
-					fmt.Println(c)
+			if _, ok := t.Forks[login]; !ok {
+				t.Forks[login] = fp.Entry{
+					Author:  login,
+					Commits: make(map[string]uint, 0),
 				}
 			}
+			var nCommits uint = 0
+			for _, c := range commits {
+				if c.Author.Login != r.Owner {
+					nCommits++
+				}
+			}
+			t.Forks[login].Commits[r.String()] = nCommits
 		}
 	}
+	return t
 }
