@@ -4,3 +4,8 @@ API:
 
 - [forks](https://docs.github.com/en/rest/repos/forks?apiVersion=2022-11-28)
 - [commits](https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28)
+
+
+Usage:
+
+    GITHUB_TOKEN=... go run cmd/forkyporkies.go repos.txt
