@@ -49,10 +49,10 @@ func fetchForkCommits(repos []fp.Repo, token string) fp.Table {
 			if _, ok := t.Forks[login]; !ok {
 				t.Forks[login] = fp.Entry{
 					Author:  login,
-					Commits: make(map[string]uint, 0),
+					Commits: make(map[string]int, 0),
 				}
 			}
-			var nCommits uint = 0
+			var nCommits int = 0
 			for _, c := range commits {
 				if c.Author.Login != r.Owner {
 					nCommits++
