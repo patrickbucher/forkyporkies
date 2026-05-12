@@ -49,14 +49,21 @@ type Commit struct {
 }
 
 func (r *Repo) GetForks(token string) ([]Fork, error) {
-	body, err := get(fmt.Sprintf("repos/%s/%s/forks", r.Owner, r.Name), token)
-	if err != nil {
-		return nil, fmt.Errorf("get forks for %s/%s: %v", r.Owner, r.Name, err)
-	}
 	var forks []Fork
-	err = json.Unmarshal(body.Bytes(), &forks)
-	if err != nil {
-		return forks, fmt.Errorf("unmarshal forks: %v", err)
+	for page := 1; ; page++ {
+		body, err := get(fmt.Sprintf("repos/%s/%s/forks?page=%d", r.Owner, r.Name, page), token)
+		if err != nil {
+			return nil, fmt.Errorf("get forks for %s/%s: %v", r.Owner, r.Name, err)
+		}
+		var pageForks []Fork
+		err = json.Unmarshal(body.Bytes(), &pageForks)
+		if err != nil {
+			return pageForks, fmt.Errorf("unmarshal forks: %v", err)
+		}
+		if len(pageForks) == 0 {
+			break
+		}
+		forks = append(forks, pageForks...)
 	}
 	return forks, nil
 }

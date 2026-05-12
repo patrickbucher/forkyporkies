@@ -42,11 +42,15 @@ func fetchForkCommits(repos []fp.Repo, token string) fp.Table {
 			fr := fp.FromFork(f)
 			login := f.Owner.Login
 			commits, err := fr.GetCommits(token)
-			firstCommit := commits[0]
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "get commits for %v: %v", fr, err)
+				fmt.Fprintf(os.Stderr, "get commits for %v: %v\n", fr, err)
 				continue
 			}
+			if len(commits) == 0 {
+				fmt.Fprintf(os.Stderr, "no commits for %v: %v\n", fr, err)
+				continue
+			}
+			firstCommit := commits[0]
 			if _, ok := t.Forks[login]; !ok {
 				t.Forks[login] = fp.Entry{
 					Author:  login,
