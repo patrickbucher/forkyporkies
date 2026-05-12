@@ -1,8 +1,11 @@
 package forkyporkies
 
 import (
+	"cmp"
 	"fmt"
+	"maps"
 	"os"
+	"slices"
 	"strings"
 	"text/tabwriter"
 )
@@ -27,7 +30,10 @@ func (t Table) Output() {
 		th = append(th, strings.Split(r, "/")[1])
 	}
 	fmt.Fprintf(tw, format, toAny(th)...)
-	for _, e := range t.Forks {
+	entries := slices.SortedFunc(maps.Values(t.Forks), func(l, r Entry) int {
+		return cmp.Compare(strings.ToLower(l.Author), strings.ToLower(r.Author))
+	})
+	for _, e := range entries {
 		commits := make([]int, 0)
 		for _, r := range t.Repos {
 			if c, ok := e.Commits[r]; ok {
