@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
+	"time"
 )
 
 const GITHUB_API_URL = "https://api.github.com"
@@ -39,6 +41,11 @@ type Commit struct {
 	Author struct {
 		Login string `json:"login"`
 	} `json:"author"`
+	Commit struct {
+		Committer struct {
+			Date time.Time `json:"date"`
+		} `json:"committer"`
+	} `json:"commit"`
 }
 
 func (r *Repo) GetForks(token string) ([]Fork, error) {
@@ -60,10 +67,14 @@ func (r *Repo) GetCommits(token string) ([]Commit, error) {
 		return nil, fmt.Errorf("get commits for %s/%s: %v", r.Owner, r.Name, err)
 	}
 	var commits []Commit
-	err = json.Unmarshal(body.Bytes(), &commits)
+	b := body.Bytes()
+	err = json.Unmarshal(b, &commits)
 	if err != nil {
 		return commits, fmt.Errorf("unmarshal commits: %v", err)
 	}
+	slices.SortFunc(commits, func(l Commit, r Commit) int {
+		return l.Commit.Committer.Date.Compare(r.Commit.Committer.Date)
+	})
 	return commits, nil
 }
 

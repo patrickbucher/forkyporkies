@@ -41,7 +41,7 @@ func (t Table) Output() {
 		for _, c := range commits {
 			s := fmt.Sprintf("%d", c)
 			if c == -1 {
-				s = "\U0001f437" // oink, oink
+				s = "X"
 			}
 			tr = append(tr, s)
 		}

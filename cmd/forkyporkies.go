@@ -42,6 +42,7 @@ func fetchForkCommits(repos []fp.Repo, token string) fp.Table {
 			fr := fp.FromFork(f)
 			login := f.Owner.Login
 			commits, err := fr.GetCommits(token)
+			firstCommit := commits[0]
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "get commits for %v: %v", fr, err)
 				continue
@@ -54,7 +55,7 @@ func fetchForkCommits(repos []fp.Repo, token string) fp.Table {
 			}
 			var nCommits int = 0
 			for _, c := range commits {
-				if c.Author.Login != r.Owner {
+				if c.Author.Login != firstCommit.Author.Login {
 					nCommits++
 				}
 			}
